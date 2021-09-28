@@ -8,6 +8,7 @@ import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.challenge.reddittopfeed.R
 import com.challenge.reddittopfeed.model.RedditChildren
 import com.challenge.reddittopfeed.databinding.TopFeedItemBinding
 import com.challenge.reddittopfeed.utils.TimeUtil
@@ -54,8 +55,10 @@ class MainAdapter :
                         } else (score.toInt() / 1000).toString() + "k"
 
                     textViewTime.text = TimeUtil.getTimeAgo(postDate)
+                    
                     Glide.with(imageViewThumbnail.context)
                         .load(thumbnailUrl)
+                        .error(R.drawable.ic_launcher_background)
                         .into(imageViewThumbnail)
 
                     binding.root.tag = permalink
