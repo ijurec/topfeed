@@ -6,16 +6,19 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.view.isVisible
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.challenge.reddittopfeed.R
-import com.challenge.reddittopfeed.data.remote.Response
+import com.challenge.reddittopfeed.api.RedditTopFeedService
+import com.challenge.reddittopfeed.data.RedditTopFeedRepository
 import com.challenge.reddittopfeed.databinding.MainFragmentBinding
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 class MainFragment : Fragment() {
 
-    private val topFeedLimit: Int = 50
+    private val topFeedLoadPortion: Int = 5
     private lateinit var mainFragmentBinding: MainFragmentBinding
     private lateinit var mainAdapter: MainAdapter
 
@@ -38,43 +41,28 @@ class MainFragment : Fragment() {
             )
         )
         mainAdapter = MainAdapter()
-        mainFragmentBinding.redditTopFeedRecyclerView.adapter = mainAdapter
 
+        mainFragmentBinding.redditTopFeedRecyclerView.adapter = mainAdapter
+        mainFragmentBinding.redditTopFeedRecyclerView.adapter =
+            mainAdapter.withLoadStateFooter(
+//                header = MainLoadStateAdapter { mainAdapter.retry() },
+                footer = MainLoadStateAdapter { mainAdapter.retry() }
+            )
         return mainFragmentBinding.root
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
-        viewModel.getTopFeed(topFeedLimit.toString(), "").observe(viewLifecycleOwner, {
-            it?.apply {
-                when (this.responseStatus) {
-                    Response.Status.SUCCESS -> {
-                        responseBody?.data?.children?.apply {
-                            mainAdapter.setTopFeedList(this)
-                            mainFragmentBinding.redditTopFeedRecyclerView.isVisible = true
-                            mainFragmentBinding.redditTopFeedProgressBar.isVisible = false
-                            mainFragmentBinding.redditTopFeedTextView.isVisible = false
-                        }
-                    }
+        getTopFeed()
+    }
 
-                    Response.Status.ERROR -> {
-                        errorMessage.apply {
-                            mainFragmentBinding.redditTopFeedTextView.text = this
-                            mainFragmentBinding.redditTopFeedRecyclerView.isVisible = false
-                            mainFragmentBinding.redditTopFeedProgressBar.isVisible = false
-                            mainFragmentBinding.redditTopFeedTextView.isVisible = true
-                        }
-                    }
-
-                    Response.Status.IN_PROGRESS -> {
-                        mainFragmentBinding.redditTopFeedRecyclerView.isVisible = false
-                        mainFragmentBinding.redditTopFeedProgressBar.isVisible = true
-                        mainFragmentBinding.redditTopFeedTextView.isVisible = false
-                    }
-                }
+    private fun getTopFeed() {
+        lifecycleScope.launch {
+            viewModel.getTopFeed(topFeedLoadPortion).collectLatest { pagingData ->
+                mainAdapter.submitData(pagingData)
             }
-        })
+        }
     }
 
 }

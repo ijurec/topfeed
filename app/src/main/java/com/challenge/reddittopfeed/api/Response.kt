@@ -1,6 +1,6 @@
-package com.challenge.reddittopfeed.data.remote
+package com.challenge.reddittopfeed.api
 
-import com.challenge.reddittopfeed.data.model.RedditTopFeed
+import com.challenge.reddittopfeed.model.RedditTopFeed
 
 class Response(
     val responseStatus: Status,

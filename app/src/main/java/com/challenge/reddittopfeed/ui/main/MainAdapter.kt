@@ -4,15 +4,16 @@ import android.net.Uri
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.browser.customtabs.CustomTabsIntent
+import androidx.paging.PagingDataAdapter
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.challenge.reddittopfeed.data.model.RedditChildren
+import com.challenge.reddittopfeed.model.RedditChildren
 import com.challenge.reddittopfeed.databinding.TopFeedItemBinding
+import com.challenge.reddittopfeed.utils.TimeUtil
 
-class MainAdapter : RecyclerView.Adapter<MainAdapter.RedditTopFeedViewHolder>() {
-
-    private var redditChildren = mutableListOf<RedditChildren>()
-
+class MainAdapter :
+    PagingDataAdapter<RedditChildren, MainAdapter.RedditTopFeedViewHolder>(REPO_COMPARATOR) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RedditTopFeedViewHolder {
         val inflater = LayoutInflater.from(parent.context)
@@ -22,16 +23,10 @@ class MainAdapter : RecyclerView.Adapter<MainAdapter.RedditTopFeedViewHolder>() 
     }
 
     override fun onBindViewHolder(holder: RedditTopFeedViewHolder, position: Int) {
-        val item = redditChildren[position]
-        holder.bind(item)
-    }
-
-    override fun getItemCount() = redditChildren.size
-
-    fun setTopFeedList(redditChildren: List<RedditChildren>) {
-        this.redditChildren.clear()
-        this.redditChildren = redditChildren.toMutableList()
-        notifyDataSetChanged()
+        val item = getItem(position)
+        if (item != null) {
+            holder.bind(item)
+        }
     }
 
     class RedditTopFeedViewHolder(private val binding: TopFeedItemBinding) :
@@ -50,13 +45,40 @@ class MainAdapter : RecyclerView.Adapter<MainAdapter.RedditTopFeedViewHolder>() 
 
         fun bind(redditItem: RedditChildren) {
             binding.apply {
-                textViewAuthor.text = redditItem.data.author
-                Glide.with(imageViewThumbnail.context)
-                    .load(redditItem.data.thumbnailUrl)
-                    .into(imageViewThumbnail)
+                with(redditItem.data) {
+                    textViewAuthor.text = "Posted by " + redditItem.data.author
+                    textViewTitle.text = title
+                    textViewRating.text =
+                        if (score.toInt() < 1000) {
+                            score
+                        } else (score.toInt() / 1000).toString() + "k"
 
-                binding.root.tag = redditItem.data.permalink
+                    textViewTime.text = TimeUtil.getTimeAgo(postDate)
+                    Glide.with(imageViewThumbnail.context)
+                        .load(thumbnailUrl)
+                        .into(imageViewThumbnail)
+
+                    binding.root.tag = permalink
+                }
             }
+        }
+    }
+
+    companion object {
+        private val REPO_COMPARATOR = object : DiffUtil.ItemCallback<RedditChildren>() {
+            override fun areItemsTheSame(
+                oldItem: RedditChildren,
+                newItem: RedditChildren
+            ): Boolean =
+                oldItem.data == newItem.data
+
+            override fun areContentsTheSame(
+                oldItem: RedditChildren,
+                newItem: RedditChildren
+            ): Boolean =
+                oldItem.data.title == newItem.data.title &&
+                        oldItem.data.author == newItem.data.author &&
+                        oldItem.data.numberOfComments == newItem.data.numberOfComments
         }
     }
 

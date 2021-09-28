@@ -1,6 +1,6 @@
-package com.challenge.reddittopfeed.data.remote
+package com.challenge.reddittopfeed.api
 
-import com.challenge.reddittopfeed.data.model.RedditTopFeed
+import com.challenge.reddittopfeed.model.RedditTopFeed
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
@@ -10,8 +10,8 @@ interface RedditTopFeedService {
 
     @GET("top.json")
     suspend fun getTopFeed(
-        @Query("limit") limit: String,
-        @Query("after") after: String
+        @Query("limit") limit: Int,
+        @Query("after") after: String? = null
     ): RedditTopFeed
 
     companion object {

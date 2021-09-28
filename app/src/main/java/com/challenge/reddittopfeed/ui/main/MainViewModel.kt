@@ -1,20 +1,19 @@
 package com.challenge.reddittopfeed.ui.main
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.liveData
-import com.challenge.reddittopfeed.data.remote.Response
-import com.challenge.reddittopfeed.data.repository.RedditTopFeedRepository
-import kotlinx.coroutines.Dispatchers
+import androidx.lifecycle.viewModelScope
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
+import com.challenge.reddittopfeed.data.RedditTopFeedRepository
+import com.challenge.reddittopfeed.model.RedditChildren
+import kotlinx.coroutines.flow.Flow
 
-class MainViewModel : ViewModel() {
+class MainViewModel() : ViewModel() {
 
-    fun getTopFeed(limit: String, after: String) = liveData(Dispatchers.IO) {
-        try {
-            emit(Response.inProgress())
-            emit(Response.success(RedditTopFeedRepository().getTopFeed(limit, after)))
-        } catch (exception: Exception) {
-            emit(Response.error(exception.message ?: "There is some network issue"))
-        }
+    private val repository = RedditTopFeedRepository()
+
+    fun getTopFeed(limit: Int): Flow<PagingData<RedditChildren>> {
+        return repository.getTopFeed(limit) .cachedIn(viewModelScope)
     }
 
 }
