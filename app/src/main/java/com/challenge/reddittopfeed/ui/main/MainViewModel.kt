@@ -8,12 +8,12 @@ import com.challenge.reddittopfeed.data.RedditTopFeedRepository
 import com.challenge.reddittopfeed.model.RedditChildren
 import kotlinx.coroutines.flow.Flow
 
-class MainViewModel() : ViewModel() {
+class MainViewModel : ViewModel() {
 
     private val repository = RedditTopFeedRepository()
 
-    fun getTopFeed(limit: Int): Flow<PagingData<RedditChildren>> {
-        return repository.getTopFeed(limit) .cachedIn(viewModelScope)
+    fun getTopFeed(dataPortion: Int): Flow<PagingData<RedditChildren>> {
+        return repository.getTopFeed(dataPortion).cachedIn(viewModelScope)
     }
 
 }

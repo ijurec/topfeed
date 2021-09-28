@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName
 
 data class RedditTopFeed(val data: RedditData)
 
-data class RedditData(val after: String, val before: String, val children: List<RedditChildren>)
+data class RedditData(var after: String?, var before: String?, val children: List<RedditChildren>)
 
 data class RedditChildren(val data: RedditChildrenData)
 

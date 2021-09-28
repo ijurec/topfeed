@@ -9,12 +9,11 @@ import kotlinx.coroutines.flow.Flow
 
 class RedditTopFeedRepository {
 
-    fun getTopFeed(limit: Int): Flow<PagingData<RedditChildren>> {
+    fun getTopFeed(dataPortion: Int): Flow<PagingData<RedditChildren>> {
         return Pager(
             config = PagingConfig(
-                pageSize = limit,
+                pageSize = dataPortion,
                 enablePlaceholders = false,
-                prefetchDistance = 1
             ),
             pagingSourceFactory = {
                 RedditTopFeedPagingSource(
