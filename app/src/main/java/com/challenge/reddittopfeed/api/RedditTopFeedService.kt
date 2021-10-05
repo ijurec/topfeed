@@ -16,12 +16,14 @@ interface RedditTopFeedService {
 
     companion object {
 
+        const val BASE_URL = "https://www.reddit.com"
+
         fun create(): RedditTopFeedService {
             val retrofit = Retrofit.Builder()
                 .addConverterFactory(
                     GsonConverterFactory.create()
                 )
-                .baseUrl("https://www.reddit.com")
+                .baseUrl(BASE_URL)
                 .build()
 
             return retrofit.create(RedditTopFeedService::class.java)

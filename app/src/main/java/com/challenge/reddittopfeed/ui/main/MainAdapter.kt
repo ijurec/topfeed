@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.challenge.reddittopfeed.R
+import com.challenge.reddittopfeed.api.RedditTopFeedService.Companion.BASE_URL
 import com.challenge.reddittopfeed.model.RedditChildren
 import com.challenge.reddittopfeed.databinding.TopFeedItemBinding
 import com.challenge.reddittopfeed.utils.TimeUtil
@@ -39,29 +40,30 @@ class MainAdapter :
                 val customTabsIntent = builder.build()
                 customTabsIntent.launchUrl(
                     binding.root.context,
-                    Uri.parse("https://www.reddit.com" + binding.root.tag.toString())
+                    Uri.parse(BASE_URL + binding.root.tag.toString())
                 )
             }
         }
 
         fun bind(redditItem: RedditChildren) {
             binding.apply {
-                with(redditItem.data) {
-                    textViewAuthor.text = "Posted by " + redditItem.data.author
+                redditItem.data.apply {
+                    textViewAuthor.text =
+                        root.context.getString(R.string.posted_by_label, redditItem.data.author)
                     textViewTitle.text = title
                     textViewRating.text =
                         if (score.toInt() < 1000) {
                             score
                         } else (score.toInt() / 1000).toString() + "k"
 
-                    textViewTime.text = TimeUtil.getTimeAgo(postDate)
-                    
-                    Glide.with(imageViewThumbnail.context)
+                    textViewTime.text = TimeUtil.getTimeAgo(binding.root.context, postDate)
+
+                    Glide.with(root.context)
                         .load(thumbnailUrl)
                         .error(R.drawable.ic_launcher_background)
                         .into(imageViewThumbnail)
 
-                    binding.root.tag = permalink
+                    root.tag = permalink
                 }
             }
         }

@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">Reddit Top Feed</string>
+    <string name="posted_by_label">Posted by %1$s</string>
+    <string name="day_ago_label"> day ago</string>
+    <string name="days_ago_label"> days ago</string>
+    <string name="hour_ago_label"> hour ago</string>
+    <string name="hours_ago_label"> hours ago</string>
+    <string name="minute_ago_label"> minute ago</string>
+    <string name="minutes_ago_label"> minutes ago</string>
+    <string name="retry_label">Retry</string>
 </resources>

@@ -12,8 +12,8 @@ class RedditTopFeedPagingSource(
 ) : PagingSource<String, RedditChildren>() {
 
     override val keyReuseSupported: Boolean = true
-    val limitToDownloadItems = 50
-    var numberOfItems: Int = 0
+    private val limitToDownloadItems = 50
+    private var numberOfItems: Int = 0
 
     override suspend fun load(params: LoadParams<String>): LoadResult<String, RedditChildren> {
         return try {

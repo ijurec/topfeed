@@ -35,23 +35,27 @@ class MainLoadStateAdapter(private val retry: () -> Unit) :
         }
 
         fun bind(loadState: LoadState) {
-            if (loadState is LoadState.Error) {
-                binding.footerErrorMessage.text = loadState.error.localizedMessage
+            binding.apply {
+                if (loadState is LoadState.Error) {
+                    footerErrorMessage.text = loadState.error.localizedMessage
+                }
+                footerProgressBar.isVisible = loadState is LoadState.Loading
+                footerRetryButton.isVisible = loadState is LoadState.Error
+                footerErrorMessage.isVisible = loadState is LoadState.Error
             }
-            binding.footerProgressBar.isVisible = loadState is LoadState.Loading
-            binding.footerRetryButton.isVisible = loadState is LoadState.Error
-            binding.footerErrorMessage.isVisible = loadState is LoadState.Error
         }
 
         companion object {
             fun create(parent: ViewGroup, retry: () -> Unit): RedditTopFeedLoadStateViewHolder {
                 val view = LayoutInflater.from(parent.context)
                     .inflate(R.layout.reddit_top_feed_load_state_footer_view_item, parent, false)
-                val binding = RedditTopFeedLoadStateFooterViewItemBinding.bind(view)
-                return RedditTopFeedLoadStateViewHolder(binding, retry)
+                return RedditTopFeedLoadStateViewHolder(
+                    RedditTopFeedLoadStateFooterViewItemBinding.bind(
+                        view
+                    ), retry
+                )
             }
         }
-
     }
 }
 

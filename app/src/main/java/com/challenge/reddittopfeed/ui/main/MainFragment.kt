@@ -8,10 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.challenge.reddittopfeed.api.RedditTopFeedService
-import com.challenge.reddittopfeed.data.RedditTopFeedRepository
 import com.challenge.reddittopfeed.databinding.MainFragmentBinding
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -19,7 +16,6 @@ import kotlinx.coroutines.launch
 class MainFragment : Fragment() {
 
     private val topFeedLoadPortion: Int = 5
-    private lateinit var mainFragmentBinding: MainFragmentBinding
     private lateinit var mainAdapter: MainAdapter
 
     companion object {
@@ -32,23 +28,25 @@ class MainFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        mainFragmentBinding = MainFragmentBinding.inflate(inflater, container, false)
-        mainFragmentBinding.redditTopFeedRecyclerView.layoutManager = LinearLayoutManager(activity)
-        mainFragmentBinding.redditTopFeedRecyclerView.addItemDecoration(
-            DividerItemDecoration(
-                activity,
-                DividerItemDecoration.VERTICAL
+        MainFragmentBinding.inflate(inflater, container, false).apply {
+            redditTopFeedRecyclerView.setHasFixedSize(true)
+            redditTopFeedRecyclerView.layoutManager =
+                LinearLayoutManager(activity)
+            redditTopFeedRecyclerView.addItemDecoration(
+                DividerItemDecoration(
+                    activity,
+                    DividerItemDecoration.VERTICAL
+                )
             )
-        )
-        mainAdapter = MainAdapter()
+            mainAdapter = MainAdapter()
 
-        mainFragmentBinding.redditTopFeedRecyclerView.adapter = mainAdapter
-        mainFragmentBinding.redditTopFeedRecyclerView.adapter =
-            mainAdapter.withLoadStateFooter(
-//                header = MainLoadStateAdapter { mainAdapter.retry() },
-                footer = MainLoadStateAdapter { mainAdapter.retry() }
-            )
-        return mainFragmentBinding.root
+            redditTopFeedRecyclerView.adapter = mainAdapter
+            redditTopFeedRecyclerView.adapter =
+                mainAdapter.withLoadStateFooter(
+                    footer = MainLoadStateAdapter { mainAdapter.retry() }
+                )
+            return root
+        }
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
